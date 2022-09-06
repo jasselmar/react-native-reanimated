@@ -414,17 +414,25 @@ jsi::Value ShareableValue::toJSValue(jsi::Runtime &rt) {
             } else {
               res = funPtr->call(rt, args, count);
             }
+          } catch (std::exception &e) {
+            std::string str = e.what();
+#ifdef ANDROID
+            throw jsi::JSError(rt, str);
+#else
+            runtimeManager->errorHandler->setError(str);
+            runtimeManager->errorHandler->raise();
+#endif
           } catch (jsi::JSError &e) {
             throw e;
           } catch (...) {
             if (demangleExceptionName(
                     abi::__cxa_current_exception_type()->name()) ==
                 "facebook::jsi::JSError") {
-              throw jsi::JSError(rt, "Javascript worklet error");
+              throw jsi::JSError(rt, "Javascript worklet error 1");
             }
             // TODO find out a way to get the error's message on hermes
             jsi::Value location = jsThis->getProperty(rt, "__location");
-            std::string str = "Javascript worklet error";
+            std::string str = "Javascript worklet error 2";
             if (location.isString()) {
               str += "\nIn file: " + location.asString(rt).utf8(rt);
             }
@@ -477,17 +485,21 @@ jsi::Value ShareableValue::toJSValue(jsi::Runtime &rt) {
                   static_cast<size_t>(params.size()));
             } catch (std::exception &e) {
               std::string str = e.what();
+#ifdef ANDROID
+              throw jsi::JSError(rt, str);
+#else
               runtimeManager->errorHandler->setError(str);
               runtimeManager->errorHandler->raise();
+#endif
             } catch (...) {
               if (demangleExceptionName(
                       abi::__cxa_current_exception_type()->name()) ==
                   "facebook::jsi::JSError") {
-                throw jsi::JSError(rt, "Javascript worklet error");
+                throw jsi::JSError(rt, "Javascript worklet error 3");
               }
               // TODO find out a way to get the error's message on hermes
               jsi::Value location = jsThis.getProperty(rt, "__location");
-              std::string str = "Javascript worklet error";
+              std::string str = "Javascript worklet error 4";
               if (location.isString()) {
                 str += "\nIn file: " + location.asString(rt).utf8(rt);
               }
