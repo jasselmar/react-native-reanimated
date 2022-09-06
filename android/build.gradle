@@ -47,13 +47,10 @@ def safeExtGet(prop, fallback) {
 }
 
 def resolveBuildType() {
-    def buildType = "debug"
-    tasks.all({ task ->
-        if (task.name == "buildCMakeRelease") {
-            buildType = "release"
-        }
-    })
-    return buildType
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskRequests()['args'].toString()
+    
+    return tskReqStr.contains('Release') ? 'release' : 'debug'
 }
 
 def resolveClientSideBuild() {
@@ -116,7 +113,7 @@ if (CLIENT_SIDE_BUILD) {
     List<Path> paths = Files.find(
             Paths.get(rootDir.parent),
             Integer.MAX_VALUE,
-            { path, basicFileAttributes -> path.toString().endsWith("/react-native-reanimated/package.json") }
+            { path, basicFileAttributes -> path.toString().endsWith("/react-native-reanimated/package.json") && !path.toString().contains("/.yarn/") }
     ).toArray()
 
     String parsedLocation = ""
@@ -281,7 +278,6 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            version "3.18.1"
         }
     }
     lintOptions {
@@ -656,7 +652,8 @@ dependencies {
     }
     implementation "com.facebook.react:react-native:+" // From node_modules
     implementation "androidx.transition:transition:1.1.0"
-    implementation "androidx.core:core:1.7.0"
+    implementation "androidx.core:core:1.6.0"
+    
     extractHeaders("com.facebook.fbjni:fbjni:" + FBJNI_VERSION + ":headers")
     extractSO("com.facebook.fbjni:fbjni:" + FBJNI_VERSION)
 
