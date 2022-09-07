@@ -1,8 +1,10 @@
 package com.swmansion.reanimated;
 
+import android.util.Log;
+
 public class AndroidErrorHandler {
 
   public static void raise(String message) {
-    throw new RuntimeException(message);
+    Log.e("reanimated", message);
   }
 }
