@@ -15,7 +15,7 @@ useFrameCallback(callback: (frameTimings: FrameTime) => void, autostart = true):
 #### `callback` [Function]
 
 A single worklet function that will be called on every frame update.
-This function recieves a [`FrameTime`](#frametime-object) object as na argument.
+This function receives a [`FrameTime`](#frametime-object) object as na argument.
 
 #### `autostart` [boolean]
 
